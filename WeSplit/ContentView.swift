@@ -12,7 +12,7 @@ struct ContentView: View {
     @State private var numberOfPeople = 2
     @State private var tipPercentage = 20
     @FocusState private var amountIsFocued: Bool
-    let tipPercentages = [10, 15, 20, 25, 0]
+    let tipPercentages = (0...100)
     
     var totalPerPerson: Double {
         let PeopleCount = Double(numberOfPeople + 2)
@@ -23,6 +23,12 @@ struct ContentView: View {
         let amountPerPerson = grandTotal / PeopleCount
         
         return amountPerPerson
+    }
+    
+    var totalTip: Double {
+        let doubledTipPercentage = Double(tipPercentage)
+        let finalTip = doubledTipPercentage / 100 * checkAmount
+        return finalTip
     }
     
     var body: some View {
@@ -36,8 +42,6 @@ struct ContentView: View {
                     Picker("Number of people", selection: $numberOfPeople) {
                         ForEach(2 ..< 100) {
                             Text("\($0) people")
-                            
-                            
                                 .toolbar {
                                     ToolbarItem(placement: .keyboard) {
                                         Button("Done") {
@@ -48,20 +52,30 @@ struct ContentView: View {
                         }
                     }
                 }
+                
                 Section {
-                    
-                    Picker("Tip percentage", selection: $tipPercentage) {
-                        ForEach(tipPercentages, id: \.self) {
-                            Text($0, format: .percent)
+                    NavigationLink {
+                        Picker("Tip percentage", selection: $tipPercentage) {
+                            ForEach(tipPercentages, id: \.self) {
+                                Text($0, format: .percent)
+                            }
                         }
+                        .pickerStyle(.wheel)
+                    } label: {
+                        Text("Tip")
                     }
-                    .pickerStyle(.segmented)
-                } header: {
-                    Text("Tip")
                 }
                 
                 Section {
                     Text(totalPerPerson, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                } header: {
+                    Text("Amount per person")
+                }
+                
+                Section {
+                    Text(checkAmount + totalTip, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                } header: {
+                    Text("Your Bill")
                 }
             }
             .navigationTitle("WeSplit")
@@ -69,9 +83,9 @@ struct ContentView: View {
     }
 }
 
+
 struct ContentViewPreview: PreviewProvider {
     static var previews: some View {
         return ContentView()
     }
 }
-
