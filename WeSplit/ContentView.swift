@@ -31,6 +31,7 @@ struct ContentView: View {
         return finalTip
     }
     
+    
     var body: some View {
         NavigationView {
             Form {
